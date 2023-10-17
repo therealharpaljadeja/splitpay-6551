@@ -1,8 +1,39 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+// pages/_app.js
+import { ChakraProvider } from "@chakra-ui/react";
+import "@rainbow-me/rainbowkit/styles.css";
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { configureChains, createConfig, WagmiConfig } from "wagmi";
+import { polygonMumbai, mantleTestnet, scrollSepolia } from "wagmi/chains";
+import { publicProvider } from "wagmi/providers/public";
+
+const { chains, publicClient } = configureChains(
+    [polygonMumbai, scrollSepolia, mantleTestnet],
+    [publicProvider()]
+);
+
+const { connectors } = getDefaultWallets({
+    appName: "ApeCoin Store",
+    projectId: "044601f65212332475a09bc14ceb3c34",
+    chains,
+});
+
+const wagmiConfig = createConfig({
+    autoConnect: true,
+    connectors,
+    publicClient,
+});
+
+function MyApp({ Component, pageProps }) {
+    return (
+        <WagmiConfig config={wagmiConfig}>
+            <RainbowKitProvider chains={chains}>
+                <ChakraProvider>
+                    <Component {...pageProps} />
+                </ChakraProvider>
+            </RainbowKitProvider>
+        </WagmiConfig>
+    );
 }
 
-export default MyApp
+export default MyApp;
