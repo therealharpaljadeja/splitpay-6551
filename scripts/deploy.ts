@@ -13,7 +13,7 @@ async function mint() {
 
     await mockErc20.mint(
         "0x0e9384235229808f4BFD4d411Cc279C5cD2eF24A",
-        ethers.utils.parseEther("2")
+        ethers.utils.parseEther("10")
     );
 }
 

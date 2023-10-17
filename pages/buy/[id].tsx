@@ -14,9 +14,19 @@ import { useRouter } from "next/router";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 import TBAAccounts from "../../components/TBAAccounts";
+import useTBA, { PNFT } from "../../hooks/useTBA";
 
 const Buy: NextPage = () => {
     const router = useRouter();
+    const {
+        mintPNFT,
+        chain,
+        getAccount,
+        transferTokens,
+        createAccount,
+        transferPNFT,
+    } = useTBA();
+
     const [contributions, setContributions] = useState({});
     const [totalContribution, setTotalContribution] = useState(0);
     const [progress, setProgress] = useState(0);
@@ -48,6 +58,41 @@ const Buy: NextPage = () => {
         setTotalContribution(totalContribution);
         setProgress((totalContribution * 100) / 4);
     }, [contributions]);
+
+    async function pay() {
+        // Mint PNFT
+        let nft = await mintPNFT();
+
+        console.log(Number(nft));
+
+        let tokenId = Number(nft);
+
+        // // Address to transfer assets to
+        let accountAddress = await getAccount(PNFT[chain?.network], tokenId);
+
+        // // Transfer tokens
+        for (const contribution of Object.keys(contributions)) {
+            if (
+                contributions[contribution] &&
+                contributions[contribution] > 0
+            ) {
+                await transferTokens(
+                    contribution,
+                    accountAddress,
+                    contributions[contribution]
+                );
+            }
+        }
+
+        // // Deploy Account
+        let hash = await createAccount(PNFT[chain.network], tokenId);
+
+        // // Transfer NFT to the receiver
+        await transferPNFT(
+            "0x22e4aFF96b5200F2789033d85fCa9F58f163E9Ea",
+            tokenId
+        );
+    }
 
     return (
         <VStack
@@ -119,7 +164,12 @@ const Buy: NextPage = () => {
                                     {product.title}
                                 </Text>
                             </VStack>
-                            <Button mt={"5"} width={"100%"}>
+                            <Button
+                                isDisabled={totalContribution < 1}
+                                mt={"5"}
+                                width={"100%"}
+                                onClick={pay}
+                            >
                                 Pay
                             </Button>
                         </VStack>
