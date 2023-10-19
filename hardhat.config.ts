@@ -30,8 +30,8 @@ const config: HardhatUserConfig = {
                 network: "scrollTestnet",
                 chainId: 534351,
                 urls: {
-                    apiURL: "https://api-sepolia.scrollscan.dev/api",
-                    browserURL: "https://sepolia.scrollscan.dev/",
+                    apiURL: "https://sepolia-blockscout.scroll.io/api",
+                    browserURL: "https://sepolia-blockscout.scroll.io/",
                 },
             },
         ],
