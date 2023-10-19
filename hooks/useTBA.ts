@@ -86,7 +86,6 @@ export default function useTBA() {
             }))
                 ? true
                 : false;
-
             accounts.push(account);
         }
         return accounts;
@@ -225,6 +224,56 @@ export default function useTBA() {
         });
     }
 
+    async function getPNFTs(address: string) {
+        if (publicClient) {
+            let pNFT = getContract({
+                address: PNFT[chain?.network],
+                abi: PNFTAbi,
+                publicClient,
+            });
+
+            let balance = await formatEther(
+                (await pNFT.read.balanceOf([address])).toString()
+            );
+
+            let accounts: Account[] = [];
+            for (let i = 0; i < balance; i++) {
+                let account: Account = {
+                    tokenId: 0,
+                    tokenURI: "",
+                    address: "",
+                    apeCoinBalance: 0,
+                    isDeployed: false,
+                };
+
+                account["tokenId"] = (await pNFT.read.tokenOfOwnerByIndex([
+                    address,
+                    i,
+                ])) as Number;
+
+                account["address"] = (await getAccount(
+                    PNFT[chain?.network],
+                    Number(account["tokenId"])
+                )) as string;
+
+                account["apeCoinBalance"] = Number(
+                    await getTokenBalance(account["address"])
+                );
+
+                account["isDeployed"] = (await publicClient.getBytecode({
+                    address: account["address"],
+                }))
+                    ? true
+                    : false;
+
+                if (Number(account.apeCoinBalance) > 0) {
+                    accounts.push(account);
+                }
+            }
+            return accounts;
+        }
+    }
+
     return {
         getAccounts,
         getNFTs,
@@ -235,5 +284,6 @@ export default function useTBA() {
         mintPNFT,
         transferPNFT,
         chain,
+        getPNFTs,
     };
 }

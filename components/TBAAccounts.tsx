@@ -14,18 +14,12 @@ import {
     VStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { encodeFunctionData, formatEther, getContract, parseEther } from "viem";
-import {
-    useAccount,
-    useNetwork,
-    usePublicClient,
-    useWalletClient,
-} from "wagmi";
-import useTBA, { Account } from "../hooks/useTBA";
+import { useNetwork, useWalletClient } from "wagmi";
+import useTBA, { Account, NFT } from "../hooks/useTBA";
 
 export default function TBAAccounts({ contributions, setContributions }) {
     const { data: walletClient } = useWalletClient();
-    const { getNFTs, getAccounts } = useTBA();
+    const { getNFTs, getAccounts, createAccount } = useTBA();
     const { chain } = useNetwork();
     const [accounts, setAccounts] = useState<Account[]>([]);
 
@@ -111,7 +105,10 @@ export default function TBAAccounts({ contributions, setContributions }) {
                                 ) : (
                                     <Button
                                         onClick={() =>
-                                            createAccount(account.tokenId)
+                                            createAccount(
+                                                NFT[chain?.network],
+                                                Number(account.tokenId)
+                                            )
                                         }
                                     >
                                         Deploy Account
