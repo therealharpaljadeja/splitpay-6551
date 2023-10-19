@@ -6,6 +6,7 @@ import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { polygonMumbai, mantleTestnet, scrollSepolia } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
+import Layout from "../components/Layout";
 
 const { chains, publicClient } = configureChains(
     [polygonMumbai, scrollSepolia, mantleTestnet],
@@ -29,7 +30,9 @@ function MyApp({ Component, pageProps }) {
         <WagmiConfig config={wagmiConfig}>
             <RainbowKitProvider chains={chains}>
                 <ChakraProvider>
-                    <Component {...pageProps} />
+                    <Layout>
+                        <Component {...pageProps} />
+                    </Layout>
                 </ChakraProvider>
             </RainbowKitProvider>
         </WagmiConfig>

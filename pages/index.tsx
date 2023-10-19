@@ -28,60 +28,36 @@ const Home: NextPage = () => {
     }, []);
 
     return (
-        <VStack
-            // bgGradient={"linear(to-tr,  #4A10FC, #0B2BB7)"}
-            height={"100vh"}
-            justifyContent={"center"}
-            padding={"20"}
-        >
-            <VStack
-                border="1px solid"
-                borderRadius={"10px"}
-                width={"100%"}
-                height={"100%"}
-                padding={"10"}
-                alignItems={"start"}
-                gap={"10"}
-            >
-                <HStack width={"100%"} justifyContent={"space-between"}>
-                    <Heading>ApeCoin Store</Heading>
-                    <ConnectButton />
-                </HStack>
-                <HStack gap="5" width={"100%"} alignItems={"start"}>
-                    {products.map((product, index) => (
-                        <VStack
-                            key={product.title}
-                            border={"1px solid"}
-                            borderRadius={"10px"}
-                            padding={"5"}
-                            width={"100%"}
-                            gap={"10"}
-                            alignItems={"start"}
-                        >
-                            <Image
-                                alignSelf={"center"}
-                                height={"300px"}
-                                src={product.image}
-                            />
-                            <HStack
-                                width={"100%"}
-                                justifyContent={"space-between"}
-                            >
-                                <Text textAlign={"left"} size={"md"}>
-                                    {product.title}
-                                </Text>
-                                <Text size={"lg"} fontWeight={"bold"}>
-                                    {product.price}
-                                </Text>
-                            </HStack>
-                            <Link href={`/buy/${index + 1}`}>
-                                <Button width={"100%"}>Buy</Button>
-                            </Link>
-                        </VStack>
-                    ))}
-                </HStack>
-            </VStack>
-        </VStack>
+        <HStack gap="5" width={"100%"} alignItems={"start"}>
+            {products.map((product, index) => (
+                <VStack
+                    key={product.title}
+                    border={"1px solid"}
+                    borderRadius={"10px"}
+                    padding={"5"}
+                    width={"100%"}
+                    gap={"10"}
+                    alignItems={"start"}
+                >
+                    <Image
+                        alignSelf={"center"}
+                        height={"300px"}
+                        src={product.image}
+                    />
+                    <HStack width={"100%"} justifyContent={"space-between"}>
+                        <Text textAlign={"left"} size={"md"}>
+                            {product.title}
+                        </Text>
+                        <Text size={"lg"} fontWeight={"bold"}>
+                            {product.price}
+                        </Text>
+                    </HStack>
+                    <Link href={`/buy/${index + 1}`}>
+                        <Button width={"100%"}>Buy</Button>
+                    </Link>
+                </VStack>
+            ))}
+        </HStack>
     );
 };
 
