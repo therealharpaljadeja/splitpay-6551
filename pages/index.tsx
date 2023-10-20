@@ -1,24 +1,26 @@
 import type { NextPage } from "next";
-import { Button, HStack, Heading, Image, Text, VStack } from "@chakra-ui/react";
+import { Button, HStack, Image, Text, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { usePublicClient } from "wagmi";
+import useTBA from "../hooks/useTBA";
 
 export type Product = {
-    title: string;
-    image: string;
+    name: string;
     price: string;
+    recipient: string;
+    image: string;
 };
 
 const Home: NextPage = () => {
+    const router = useRouter();
+    const { getProducts } = useTBA();
     const [products, setProducts] = useState<Product[]>([]);
 
     useEffect(() => {
         (async () => {
-            let response = await fetch(
-                "https://fakestoreapi.com/products?limit=3"
-            );
-            const products = await response.json();
+            let products = await getProducts();
             setProducts(products);
         })();
 
@@ -31,11 +33,11 @@ const Home: NextPage = () => {
         <HStack gap="5" width={"100%"} alignItems={"start"}>
             {products.map((product, index) => (
                 <VStack
-                    key={product.title}
-                    border={"1px solid"}
+                    key={product.name}
+                    border={"1px solid #ddd"}
                     borderRadius={"10px"}
                     padding={"5"}
-                    width={"100%"}
+                    width={"400px"}
                     gap={"10"}
                     alignItems={"start"}
                 >
@@ -46,15 +48,21 @@ const Home: NextPage = () => {
                     />
                     <HStack width={"100%"} justifyContent={"space-between"}>
                         <Text textAlign={"left"} size={"md"}>
-                            {product.title}
+                            {product.name}
                         </Text>
                         <Text size={"lg"} fontWeight={"bold"}>
-                            {product.price}
+                            {product.price} APE
                         </Text>
                     </HStack>
-                    <Link href={`/buy/${index + 1}`}>
-                        <Button width={"100%"}>Buy</Button>
-                    </Link>
+                    <Button
+                        onClick={() => router.push(`/buy/${index}`)}
+                        bg="#0B2BB7"
+                        _hover={{ bg: "#0B2Bdf" }}
+                        textColor={"white"}
+                        width={"100%"}
+                    >
+                        Buy
+                    </Button>
                 </VStack>
             ))}
         </HStack>

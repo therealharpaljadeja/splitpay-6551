@@ -10,6 +10,7 @@ import ApeCoinAbi from "../abi/ApeCoin";
 import AccountAbi from "../abi/SimpleERC6551Account";
 import erc6551RegistryAbi from "../abi/ERC6551Registry";
 import PNFTAbi from "../abi/PNFT";
+import ProductsAbi from "../abi/Products";
 
 export type NFT = {
     tokenId: Number;
@@ -52,6 +53,12 @@ export const PNFT = {
     "scroll-sepolia": "0xaC45c833E270300167b94DB759A21eAAE7eF5C78",
     mantle: "0xd45A1D84d62AA0976618a3B7c56D96ff0A2389c6",
     maticmum: "0x2c8bf7Bd8bfbF6227DedD12cDe5f2AB3d60bA1B4",
+};
+
+export const Products = {
+    "scroll-sepolia": "0xec6cF839755522D60641E15C69caC507550d3151",
+    mantle: "0xFeE84A8b5ed258D61B457418f5F9C1c066906901",
+    maticmum: "0xFeE84A8b5ed258D61B457418f5F9C1c066906901",
 };
 
 export default function useTBA() {
@@ -130,13 +137,15 @@ export default function useTBA() {
                 walletClient,
             });
 
-            return await registry.write.createAccount([
+            let hash = await registry.write.createAccount([
                 IMPLEMENTATION[chain?.network],
                 "0x0000000000000000000000000000000000000000000000000000000000000000",
                 chain?.id,
                 tokenContract,
                 tokenId,
             ]);
+
+            await publicClient.waitForTransactionReceipt({ hash });
         }
     }
 
@@ -157,7 +166,7 @@ export default function useTBA() {
                     args: [APECOIN[chain?.network], 0, calldata, 0],
                 }),
             });
-            console.log(hash);
+            await publicClient.waitForTransactionReceipt({ hash });
         }
     }
 
@@ -214,7 +223,7 @@ export default function useTBA() {
     }
 
     async function transferPNFT(to: string, tokenId: Number) {
-        await walletClient?.sendTransaction({
+        let hash = await walletClient?.sendTransaction({
             to: PNFT[chain?.network],
             data: encodeFunctionData({
                 abi: PNFTAbi,
@@ -222,6 +231,8 @@ export default function useTBA() {
                 args: [address, to, tokenId],
             }),
         });
+
+        await publicClient.waitForTransactionReceipt({ hash });
     }
 
     async function getPNFTs(address: string) {
@@ -232,9 +243,7 @@ export default function useTBA() {
                 publicClient,
             });
 
-            let balance = await formatEther(
-                (await pNFT.read.balanceOf([address])).toString()
-            );
+            let balance = (await pNFT.read.balanceOf([address])).toString();
 
             let accounts: Account[] = [];
             for (let i = 0; i < balance; i++) {
@@ -274,6 +283,40 @@ export default function useTBA() {
         }
     }
 
+    async function getProducts() {
+        let productsContract = getContract({
+            abi: ProductsAbi,
+            address: Products[chain?.network],
+            publicClient,
+        });
+
+        let numOfProducts = await productsContract.read.products();
+
+        let products = [];
+
+        for (let i = 0; i < Number(numOfProducts); i++) {
+            let result = await productsContract.read.productDetails([i]);
+            result.price = formatEther(result.price as bigint);
+            products.push(result);
+        }
+
+        return products;
+    }
+
+    async function getProduct(tokenId) {
+        let productsContract = getContract({
+            abi: ProductsAbi,
+            address: Products[chain?.network],
+            publicClient,
+        });
+
+        let result = await productsContract.read.productDetails([tokenId]);
+
+        result.price = formatEther(result.price as bigint);
+
+        return result;
+    }
+
     return {
         getAccounts,
         getNFTs,
@@ -285,5 +328,7 @@ export default function useTBA() {
         transferPNFT,
         chain,
         getPNFTs,
+        getProducts,
+        getProduct,
     };
 }

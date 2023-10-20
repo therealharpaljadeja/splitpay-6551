@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
 // Scroll: 0xC323b2Dbddc165e028de78eb5Ca43a9072d037f5
-// Mantle: 0x3E2375eEa603f750be14273F695d1E687379eD55
+// Mantle: 0x4C8AFaE32F6A3ea0B8bcF60FA23402D8E4099e99
 // Mumbai: 0xd45A1D84d62AA0976618a3B7c56D96ff0A2389c6
 
 async function mint() {
@@ -28,9 +28,9 @@ async function getNFTs() {
 async function main() {
     // await mint();
     // await getNFTs();
-    // let ApeNFT = await ethers.getContractFactory("ApeNFT");
-    // let apeNFT = await ApeNFT.deploy("ApeNFT", "ANFT");
-    // console.log(`ApeNFT: ${apeNFT.address}`);
+    let ApeNFT = await ethers.getContractFactory("ApeNFT");
+    let apeNFT = await ApeNFT.deploy("ApeNFT", "ANFT");
+    console.log(`ApeNFT: ${apeNFT.address}`);
 }
 
 main().catch((error) => {

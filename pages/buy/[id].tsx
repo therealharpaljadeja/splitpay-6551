@@ -14,10 +14,15 @@ import { useRouter } from "next/router";
 import TBAAccounts from "../../components/TBAAccounts";
 import useTBA, { PNFT } from "../../hooks/useTBA";
 import { useAccount } from "wagmi";
+import { useToast } from "@chakra-ui/react";
 
 const Buy: NextPage = () => {
     const router = useRouter();
     const { isConnected } = useAccount();
+    const [isClient, setIsClient] = useState(false);
+
+    const toast = useToast();
+
     const {
         mintPNFT,
         chain,
@@ -25,6 +30,7 @@ const Buy: NextPage = () => {
         transferTokens,
         createAccount,
         transferPNFT,
+        getProduct,
     } = useTBA();
 
     const [contributions, setContributions] = useState({});
@@ -34,14 +40,14 @@ const Buy: NextPage = () => {
     const [product, setProduct] = useState<Product>();
 
     useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    useEffect(() => {
         (async () => {
             if (router.query.id) {
-                let response = await fetch(
-                    `https://fakestoreapi.com/products/${router.query.id}`
-                );
-
-                const products = await response.json();
-                setProduct(products);
+                let result = await getProduct(router.query.id);
+                setProduct(result);
             }
         })();
 
@@ -51,47 +57,125 @@ const Buy: NextPage = () => {
     }, [router.query]);
 
     useEffect(() => {
-        let totalContribution = 0;
-        Object.values(contributions).forEach(
-            (value) => (totalContribution += Number(value))
-        );
-        setTotalContribution(totalContribution);
-        setProgress((totalContribution * 100) / 4);
+        if (product) {
+            let totalContribution = 0;
+            Object.values(contributions).forEach(
+                (value) => (totalContribution += Number(value))
+            );
+            setTotalContribution(totalContribution);
+            setProgress((totalContribution * 100) / product.price);
+        }
     }, [contributions]);
 
     async function pay() {
-        // Mint PNFT
-        let nft = await mintPNFT();
+        if (product) {
+            // Mint PNFT
+            let nft = await mintPNFT();
 
-        console.log(Number(nft));
+            let tokenId = Number(nft);
 
-        let tokenId = Number(nft);
+            // // Address to transfer assets to
+            let accountAddress = await getAccount(
+                PNFT[chain?.network],
+                tokenId
+            );
 
-        // // Address to transfer assets to
-        let accountAddress = await getAccount(PNFT[chain?.network], tokenId);
+            // // Transfer tokens
+            for (const contribution of Object.keys(contributions)) {
+                if (
+                    contributions[contribution] &&
+                    contributions[contribution] > 0
+                ) {
+                    let toastId = toast({
+                        title: "Transferring tokens to payment TBA",
+                        variant: "left-accent",
+                        duration: 60000,
+                        position: "bottom",
+                        status: "loading",
+                    });
 
-        // // Transfer tokens
-        for (const contribution of Object.keys(contributions)) {
-            if (
-                contributions[contribution] &&
-                contributions[contribution] > 0
-            ) {
-                await transferTokens(
-                    contribution,
-                    accountAddress,
-                    contributions[contribution]
-                );
+                    try {
+                        await transferTokens(
+                            contribution,
+                            accountAddress,
+                            contributions[contribution]
+                        );
+
+                        toast.update(toastId, {
+                            title: "Tokens transferred to Payment TBA",
+                            status: "success",
+                        });
+                    } catch (error) {
+                        toast.update(toastId, {
+                            title: "Something went wrong",
+                            status: "error",
+                        });
+                    }
+                }
             }
+
+            let createAccountToast = toast({
+                title: "Creating Payment TBA",
+                position: "bottom",
+                variant: "left-accent",
+                status: "loading",
+                duration: 60000,
+            });
+
+            try {
+                // // Deploy Account
+
+                await createAccount(PNFT[chain.network], tokenId);
+
+                toast.update(createAccountToast, {
+                    status: "success",
+                    title: "PNFT TBA Created",
+                    isClosable: true,
+                    position: "bottom",
+                    variant: "left-accent",
+                });
+            } catch (error) {
+                toast.update(createAccountToast, {
+                    status: "error",
+                    title: " Something went wrong",
+                });
+            }
+
+            let transferPNFTToast = toast({
+                title: "Transfer TBA to Recipient",
+                position: "bottom",
+                variant: "left-accent",
+                status: "loading",
+                duration: 60000,
+            });
+
+            try {
+                // // Transfer NFT to the receiver
+
+                await transferPNFT(product.recipient, tokenId);
+
+                toast.update(transferPNFTToast, {
+                    title: "Buy Success",
+                    isClosable: true,
+                    position: "bottom",
+                    variant: "left-accent",
+                    status: "success",
+                });
+            } catch (error) {
+                toast.update(transferPNFTToast, {
+                    title: " Something went wrong",
+                    status: "error",
+                });
+            }
+
+            await new Promise((res) => setTimeout(res, 2000));
+
+            router.push("/");
         }
+    }
 
-        // // Deploy Account
-        let hash = await createAccount(PNFT[chain.network], tokenId);
-
-        // // Transfer NFT to the receiver
-        await transferPNFT(
-            "0x22e4aFF96b5200F2789033d85fCa9F58f163E9Ea",
-            tokenId
-        );
+    if (!isClient) {
+        return null;
     }
 
     return (
@@ -106,29 +190,39 @@ const Buy: NextPage = () => {
                         contributions={contributions}
                         setContributions={setContributions}
                     />
-                    <Text>
-                        Need more{" "}
-                        {totalContribution > 4 ? 0 : 4 - totalContribution} APE
-                        tokens
-                    </Text>
-                    <Progress
-                        hasStripe
-                        value={progress}
-                        size="sm"
-                        height="16px"
-                        width={"60%"}
-                        colorScheme="green"
-                        borderRadius={"10"}
-                    />
+                    {product && (
+                        <>
+                            <Text>
+                                Need more{" "}
+                                {totalContribution > product.price
+                                    ? 0
+                                    : product?.price - totalContribution}{" "}
+                                APE tokens
+                            </Text>
+                            <Progress
+                                hasStripe
+                                value={progress}
+                                size="sm"
+                                height="16px"
+                                width={"60%"}
+                                colorScheme="green"
+                                borderRadius={"10"}
+                            />
+                        </>
+                    )}
                 </VStack>
             ) : (
                 <Text>Please Connect Wallet</Text>
             )}
             {product && (
-                <VStack border="1px solid" borderRadius={"10px"} padding={"10"}>
+                <VStack
+                    border="1px solid #ddd"
+                    borderRadius={"10px"}
+                    padding={"10"}
+                >
                     <Image
                         alignSelf={"center"}
-                        width="300px"
+                        width="400px"
                         height={"300px"}
                         src={product.image}
                         mb="20px"
@@ -139,17 +233,20 @@ const Buy: NextPage = () => {
                         alignItems={"start"}
                     >
                         <Text size={"lg"} fontWeight={"bold"}>
-                            {product.price}
+                            {product.price} APE
                         </Text>
                         <Text textAlign={"left"} size={"md"}>
-                            {product.title}
+                            {product.name}
                         </Text>
                     </VStack>
                     <Button
-                        isDisabled={totalContribution < 1}
+                        isDisabled={totalContribution < product.price}
                         mt={"5"}
-                        width={"100%"}
                         onClick={pay}
+                        bg="#0B2BB7"
+                        _hover={{ bg: "#0B2Bdf" }}
+                        textColor={"white"}
+                        width={"100%"}
                     >
                         Pay
                     </Button>
