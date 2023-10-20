@@ -5,13 +5,15 @@ import Link from "next/link";
 export default function Layout({ children }) {
     return (
         <VStack
-            // bgGradient={"linear(to-tr,  #4A10FC, #0B2BB7)"}
+            bgGradient={"linear(to-tr,  #4A10FC, #0B2BB7)"}
             height={"100vh"}
             justifyContent={"center"}
             padding={"20"}
         >
             <VStack
                 border="1px solid"
+                shadow={"sm"}
+                bg="white"
                 borderRadius={"10px"}
                 width={"100%"}
                 height={"100%"}
