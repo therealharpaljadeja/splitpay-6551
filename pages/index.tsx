@@ -1,9 +1,8 @@
 import type { NextPage } from "next";
 import { Button, HStack, Image, Text, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/router";
-import { usePublicClient } from "wagmi";
+import { useAccount } from "wagmi";
 import useTBA from "../hooks/useTBA";
 
 export type Product = {
@@ -15,19 +14,35 @@ export type Product = {
 
 const Home: NextPage = () => {
     const router = useRouter();
+    const { isConnected } = useAccount();
     const { getProducts } = useTBA();
     const [products, setProducts] = useState<Product[]>([]);
 
+    // Hydration
+    const [isClient, setIsClient] = useState(false);
+
     useEffect(() => {
-        (async () => {
-            let products = await getProducts();
-            setProducts(products);
-        })();
+        setIsClient(true);
+    }, []);
+
+    useEffect(() => {
+        if (isConnected) {
+            (async () => {
+                let products = await getProducts();
+                setProducts(products);
+            })();
+        }
 
         return () => {
             setProducts([]);
         };
-    }, []);
+    }, [isConnected]);
+
+    if (!isClient) return null;
+
+    if (!isConnected) {
+        return <Text>Please Connect Wallet</Text>;
+    }
 
     return (
         <HStack gap="5" width={"100%"} alignItems={"start"}>
