@@ -57,8 +57,8 @@ export const PNFT = {
 
 export const Products = {
     "scroll-sepolia": "0xec6cF839755522D60641E15C69caC507550d3151",
-    mantle: "0xFeE84A8b5ed258D61B457418f5F9C1c066906901",
-    maticmum: "0xFeE84A8b5ed258D61B457418f5F9C1c066906901",
+    mantle: "0x6936D312C8b06d4b7EA879aEf32c2eE9E23B1305",
+    maticmum: "0x6936D312C8b06d4b7EA879aEf32c2eE9E23B1305",
 };
 
 export default function useTBA() {
