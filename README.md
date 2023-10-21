@@ -8,6 +8,8 @@
 
 ### Flow Diagram
 
+![architecture](./public/architecture.png)
+
 ### Problem
 
 ERC-6551 Token Bound Accounts allow creating accounts for NFTs, but if we have a lot of NFTs we will have assets distributed in many accounts.
