@@ -4,25 +4,19 @@ import { ethers } from "hardhat";
 // Mantle = 0x070d4A2BCe5b31b4aC0687B5D11177d89090A5fF
 // Mumbai = 0x070d4A2BCe5b31b4aC0687B5D11177d89090A5fF
 
-async function mint() {
+async function mint(address: string) {
     let [deployer] = await ethers.getSigners();
-    let mockErc20 = await ethers.getContractAt(
-        "MockERC20",
-        "0x070d4A2BCe5b31b4aC0687B5D11177d89090A5fF"
-    );
+    let mockErc20 = await ethers.getContractAt("MockERC20", address);
 
-    await mockErc20.mint(
-        "0xD8904c8207D23d835d4E8137831D941849010641",
-        ethers.utils.parseEther("2")
-    );
+    await mockErc20.mint(deployer.address, ethers.utils.parseEther("2"));
 }
 
 async function main() {
-    // let MockERC20 = await ethers.getContractFactory("MockERC20");
-    // let mockErc20 = await MockERC20.deploy("ApeCoin", "APE");
+    let MockERC20 = await ethers.getContractFactory("MockERC20");
+    let mockErc20 = await MockERC20.deploy("ApeCoin", "APE");
+    console.log(`MockERC20: ${mockErc20.address}`);
 
-    mint();
-    // console.log(`MockERC20: ${mockErc20.address}`);
+    await mint(mockErc20.address);
 }
 
 main().catch((error) => {
