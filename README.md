@@ -1,34 +1,98 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# SplitPay
 
-## Getting Started
+### Team
 
-First, run the development server:
+-   Harpalsinh Jadeja
+    -   twitter - harpaljadeja11
+    -   email - jadejaharpal14@gmail.com
+
+### Flow Diagram
+
+### Problem
+
+ERC-6551 Token Bound Accounts allow creating accounts for NFTs, but if we have a lot of NFTs we will have assets distributed in many accounts.
+
+If the user wants to pay or buy something where in the amount to transfer is more than the balance of a single TBA then the user has to transfer assets among TBAs manually before he/she can proceed with the payment.
+
+This project allows paying/buying without the user manually transferring assets among TBAs!
+
+### Solution
+
+Rather than making the users do transferring and figure out sending assets for payment/buy the project asks the users which accounts to use and how many assets from each account and does the transfer!
+
+![payment](./public/payment.png)
+
+### Contract Address
+
+#### Scroll Sepolia
+
+-   ERC6551Registry - [0xF9dCbF5a1C021F56F04B2767f2707d36ECA10bbb](https://sepolia-blockscout.scroll.io/address/0xF9dCbF5a1C021F56F04B2767f2707d36ECA10bbb)
+
+-   Simple6551Implementation - [0x5BD110776F5fF4aF16838C68C4DB711320852897](https://sepolia-blockscout.scroll.io/address/0x5BD110776F5fF4aF16838C68C4DB711320852897)
+
+-   ApeNFT - [0xC323b2Dbddc165e028de78eb5Ca43a9072d037f5](https://sepolia-blockscout.scroll.io/address/0xC323b2Dbddc165e028de78eb5Ca43a9072d037f5)
+
+-   ApeCoin - [0x070d4A2BCe5b31b4aC0687B5D11177d89090A5fF](https://sepolia-blockscout.scroll.io/address/0x070d4A2BCe5b31b4aC0687B5D11177d89090A5fF)
+
+-   pNFT - [0xaC45c833E270300167b94DB759A21eAAE7eF5C78](https://sepolia-blockscout.scroll.io/address/0xaC45c833E270300167b94DB759A21eAAE7eF5C78)
+
+-   Products - [0xec6cF839755522D60641E15C69caC507550d3151](https://sepolia-blockscout.scroll.io/address/0xec6cF839755522D60641E15C69caC507550d3151)
+
+#### Mantle Testnet
+
+-   ERC6551Registry - [0x5e42ba8188a68BB96a85b712F590f769fDBC1fE9](https://explorer.testnet.mantle.xyz/address/0x5e42ba8188a68BB96a85b712F590f769fDBC1fE9)
+
+-   Simple6551Implementation - [0xB5e112494224096957AfA2d176f00F33c596Cf56](https://explorer.testnet.mantle.xyz/address/0xB5e112494224096957AfA2d176f00F33c596Cf56)
+
+-   ApeNFT - [0x4C8AFaE32F6A3ea0B8bcF60FA23402D8E4099e99](https://explorer.testnet.mantle.xyz/address/0x4C8AFaE32F6A3ea0B8bcF60FA23402D8E4099e99)
+
+-   ApeCoin - [0x070d4A2BCe5b31b4aC0687B5D11177d89090A5fF](https://explorer.testnet.mantle.xyz/address/0x070d4A2BCe5b31b4aC0687B5D11177d89090A5fF)
+
+-   pNFT - [0xd45A1D84d62AA0976618a3B7c56D96ff0A2389c6](https://explorer.testnet.mantle.xyz/address/0xd45A1D84d62AA0976618a3B7c56D96ff0A2389c6)
+
+-   Products - [0x6936D312C8b06d4b7EA879aEf32c2eE9E23B1305](https://explorer.testnet.mantle.xyz/address/0x6936D312C8b06d4b7EA879aEf32c2eE9E23B1305)
+
+#### Mumbai Testnet
+
+-   ERC6551Registry - [0x5BD110776F5fF4aF16838C68C4DB711320852897](https://mumbai.polygonscan.com/address/0x5BD110776F5fF4aF16838C68C4DB711320852897)
+
+-   Simple6551Implementation - [0xF9dCbF5a1C021F56F04B2767f2707d36ECA10bbb](https://mumbai.polygonscan.com/address/0xF9dCbF5a1C021F56F04B2767f2707d36ECA10bbb)
+
+-   ApeNFT - [0xd45A1D84d62AA0976618a3B7c56D96ff0A2389c6](https://mumbai.polygonscan.com/address/0xd45A1D84d62AA0976618a3B7c56D96ff0A2389c6)
+
+-   ApeCoin - [0x070d4A2BCe5b31b4aC0687B5D11177d89090A5fF](https://mumbai.polygonscan.com/address/0x070d4A2BCe5b31b4aC0687B5D11177d89090A5fF)
+
+-   pNFT - [0x2c8bf7Bd8bfbF6227DedD12cDe5f2AB3d60bA1B4](https://mumbai.polygonscan.com/address/0x2c8bf7Bd8bfbF6227DedD12cDe5f2AB3d60bA1B4)
+
+-   Products - [0xFeE84A8b5ed258D61B457418f5F9C1c066906901](https://mumbai.polygonscan.com/address/0xFeE84A8b5ed258D61B457418f5F9C1c066906901)
+
+### How to use?
+
+#### Clone the repo
 
 ```bash
-npm run dev
-# or
+git clone https://github.com/therealharpaljadeja/splitpay-6551.git
+```
+
+#### Run the project
+
+```bash
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Contracts are already deployed, however you can manually run the scripts in the `/scripts` folder using the following command.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+```bash
+npx hardhat run <SCRIPT_PATH>
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+#### Future plans for the project
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+Make it more generalised for all TBAs currently only works for the contracts I have deployed.
 
-## Learn More
+#### Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+-   Solidity Smart Contracts
+-   Deployed on Mantle Testnet, Scroll Sepolia and Mumbai Testnet
+-   Wagmi, Viem and RainbowKit for Web3 Frontend Development
+-   Hardhat for deployment
