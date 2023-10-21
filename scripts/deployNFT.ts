@@ -18,7 +18,7 @@ async function getNFTs(address: string) {
     );
 
     let balance = await apeNFT.balanceOf(deployer.address);
-    for (let i = 0; i < balance; i++)
+    for (let i = 0; i < Number(balance); i++)
         console.log(await apeNFT.tokenOfOwnerByIndex(deployer.address, i));
 }
 

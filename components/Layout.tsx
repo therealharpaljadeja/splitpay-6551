@@ -1,8 +1,13 @@
 import { HStack, Image, Text, VStack } from "@chakra-ui/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
+import { ReactElement, ReactNode } from "react";
 
-export default function Layout({ children }) {
+type LayoutProps = {
+    children: ReactNode;
+};
+
+export default function Layout({ children }: LayoutProps) {
     return (
         <VStack
             bgGradient={"linear(to-tr,  #4A10FC, #0B2BB7)"}

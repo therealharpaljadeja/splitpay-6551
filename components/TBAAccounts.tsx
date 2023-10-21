@@ -16,12 +16,21 @@ import {
     VStack,
     useToast,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useNetwork, useWalletClient } from "wagmi";
 import useTBA, { Account, NFT } from "../hooks/useTBA";
-import { Skeleton, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
+import { Skeleton } from "@chakra-ui/react";
+import { ChainConfig } from "viem/_types/types/chain";
 
-export default function TBAAccounts({ contributions, setContributions }) {
+type TBAAccountsProps = {
+    contributions: { [T: string]: string };
+    setContributions: Dispatch<SetStateAction<{}>>;
+};
+
+export default function TBAAccounts({
+    contributions,
+    setContributions,
+}: TBAAccountsProps) {
     const { data: walletClient } = useWalletClient();
     const toast = useToast();
     const { getNFTs, getAccounts, createAccount } = useTBA();
@@ -49,7 +58,7 @@ export default function TBAAccounts({ contributions, setContributions }) {
         setContributions({ ...contributions, [address]: value });
     }
 
-    async function deployAccount(tokenId) {
+    async function deployAccount(tokenId: Number) {
         let createAccountToast = toast({
             title: "Deploying TBA",
             variant: "left-accent",
@@ -59,7 +68,11 @@ export default function TBAAccounts({ contributions, setContributions }) {
         });
 
         try {
-            await createAccount(NFT[chain?.network], Number(tokenId));
+            await createAccount(
+                //@ts-ignore
+                NFT[chain.network],
+                Number(tokenId)
+            );
 
             toast.update(createAccountToast, {
                 title: "Tokens transferred to Payment TBA",
@@ -170,10 +183,15 @@ export default function TBAAccounts({ contributions, setContributions }) {
                                                         }
                                                         width={"100px"}
                                                         isInvalid={
-                                                            contributions[
-                                                                account.address
-                                                            ] >
-                                                            account.apeCoinBalance
+                                                            Number(
+                                                                contributions[
+                                                                    account
+                                                                        .address
+                                                                ]
+                                                            ) >
+                                                            Number(
+                                                                account.apeCoinBalance
+                                                            )
                                                         }
                                                         onChange={({
                                                             target,
@@ -184,7 +202,9 @@ export default function TBAAccounts({ contributions, setContributions }) {
                                                             )
                                                         }
                                                     />
-                                                    <InputRightAddon children="APE" />
+                                                    <InputRightAddon>
+                                                        APE
+                                                    </InputRightAddon>
                                                 </InputGroup>
                                             </>
                                         ) : (

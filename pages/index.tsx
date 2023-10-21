@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { NextPage } from "next";
 import { Button, HStack, Image, Text, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";

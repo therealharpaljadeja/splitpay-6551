@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { encodeFunctionData, formatEther, getContract, parseEther } from "viem";
 import {
     useAccount,

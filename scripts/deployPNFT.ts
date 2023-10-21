@@ -14,7 +14,7 @@ async function getNFTs(address: string) {
     let pNFT = await ethers.getContractAt("PNFT", address);
 
     let balance = await pNFT.balanceOf(deployer.address);
-    for (let i = 0; i < balance; i++)
+    for (let i = 0; i < Number(balance); i++)
         console.log(await pNFT.tokenOfOwnerByIndex(deployer.address, i));
 }
 
